@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Telport — Impresión 3D & Prototipado Rápido</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0e1117;
+      --surface:#111827;
+      --card:#ffffff;
+      --text:#e8eefc;
+      --ink:#0b1220;
+      --muted:#9aa4b2;
+      --primary:#22c55e;
+      --radius:18px;
+      --shadow:0 12px 28px rgba(0,0,0,.22);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f6f7fb;color:var(--ink)}
+    header{
+      background: radial-gradient(1200px 600px at 20% -10%, #1e293b 0%, var(--bg) 45%, #0b0e14 100%);
+      color:var(--text);
+      padding: clamp(32px, 6vw, 80px) 24px;
+      position:relative;
+      overflow:hidden;
+    }
+    .wrap{max-width:1120px;margin:0 auto}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+    .brand .logo{width:48px;height:48px;border-radius:12px;background:#1f2937;display:grid;place-items:center;font-weight:800}
+    .brand .logo span{font-size:20px;letter-spacing:1px}
+    h1{font-size: clamp(28px, 5vw, 54px);line-height:1.05;margin:10px 0 16px}
+    p.lead{font-size: clamp(16px, 2.6vw, 20px);color:#cbd5e1;max-width:64ch}
+    .cta{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+    .btn{appearance:none;border:0;border-radius:14px;padding:14px 18px;font-weight:600;cursor:pointer}
+    .btn.primary{background:var(--primary);color:#0a111b;box-shadow:var(--shadow)}
+    .btn.ghost{background:transparent;color:var(--text);border:1px solid #334155}
+    .hero-shot{position:absolute;inset:auto -140px -120px auto;opacity:.12;filter:drop-shadow(0 30px 50px rgba(0,0,0,.45))}
+    section{padding: clamp(32px, 6vw, 72px) 24px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+    .card{grid-column: span 4;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+    .card h3{margin:10px 0 8px}
+    .muted{color:#64748b}
+    .band{background:var(--surface);color:var(--text);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+    .band h2{margin:0 0 10px}
+    footer{padding:28px 24px;color:#6b7280;text-align:center}
+    a{color:inherit}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand">
+        <div class="logo"><span>TP</span></div>
+        <div>
+          <div style="font-size:18px;font-weight:700;letter-spacing:.4px">Telport</div>
+          <div class="muted" style="font-size:13px">Impresión 3D • Prototipado • Diseño</div>
+        </div>
+      </div>
+      <h1>Fabricá hoy lo que imaginás para mañana</h1>
+      <p class="lead">Servicio de impresión 3D y prototipado rápido para emprendedores, ingenierías y educación. Materiales PLA, PETG y resinas técnicas. Entregas en 48–72 h.</p>
+      <div class="cta">
+        <a class="btn primary" href="#contacto">Pedir presupuesto</a>
+        <a class="btn ghost" href="#servicios">Ver servicios</a>
+      </div>
+      <svg class="hero-shot" width="700" height="420" viewBox="0 0 700 420" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="60" y="50" width="580" height="300" rx="24" stroke="white" opacity=".14"/>
+        <path d="M90 280 L200 220 L360 260 L520 210 L610 240" stroke="white" opacity=".14"/>
+        <circle cx="200" cy="140" r="26" stroke="white" opacity=".14"/>
+      </svg>
+    </div>
+  </header>
+  <section id="servicios">
+    <div class="wrap grid">
+      <div class="band" style="grid-column: span 12">
+        <h2>Servicios</h2>
+        <p class="muted">Diseño CAD a medida, optimización para impresión, armado y posprocesado. Soporte para educación y PYMES.</p>
+      </div>
+      <article class="card"><h3>Impresión 3D FDM</h3><p class="muted">Prototipos funcionales en PLA/PETG/TPU. Volumen 220×220×250 mm. Tolerancias típicas ±0.2 mm.</p></article>
+      <article class="card"><h3>Resina (SLA/DLP)</h3><p class="muted">Alta resolución para piezas pequeñas y detalladas. Ideal para ingeniería y dental.</p></article>
+      <article class="card"><h3>Diseño & CAD</h3><p class="muted">Modelado 3D, conversión de STL/STEP, hollows, refuerzos y validación estructural básica.</p></article>
+    </div>
+  </section>
+  <section><div class="wrap grid"><div class="band" style="grid-column: span 12"><h2>Cómo trabajamos</h2><p class="muted">1) Enviás tu archivo (STL/STEP) o una idea. 2) Cotizamos. 3) Producción en 48–72 h. 4) Entrega o envío.</p></div></div></section>
+  <section id="contacto">
+    <div class="wrap grid">
+      <div class="band" style="grid-column: span 12">
+        <h2>Contacto</h2>
+        <p class="muted">Escribinos por WhatsApp o email. Respuesta en menos de 24 h hábiles.</p>
+        <div class="cta">
+          <a class="btn primary" href="https://wa.me/5490000000000" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn ghost" href="mailto:contacto@tudominio.com">contacto@tudominio.com</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>© <span id="y"></span> Telport — Hecho con ♥ en Argentina</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+</body>
+</html>
