@@ -1,1206 +1,859 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <title>Telport 3D — Diseños 3D bajo demanda</title>
+  <meta charset="UTF-8" />
+  <title>Telport 3D — Impresión 3D bajo demanda</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Telport 3D es la plataforma donde diseñadores suben sus modelos 3D y los usuarios los imprimen directamente desde la web.">
+
+  <!-- Fuente -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase SDKs (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
   <style>
-    :root {
-      --bg-dark: #020617;
-      --bg-section: #020819;
-      --bg-card: #020617;
-      --primary: #ff4b4b;
-      --primary-soft: rgba(255,75,75,0.2);
-      --accent: #f97373;
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --radius-lg: 18px;
-      --shadow-soft: 0 18px 45px rgba(15,23,42,0.9);
-      --border-subtle: 1px solid rgba(148,163,184,0.2);
+    :root{
+      --bg-main:#030617;
+      --bg-elevated:#05091f;
+      --bg-card:#050a1f;
+      --border-subtle:#111827;
+      --accent:#ff4b5c;
+      --accent-soft:rgba(255,75,92,0.14);
+      --accent-strong:#ff596a;
+      --text-main:#e5e7eb;
+      --text-muted:#9ca3af;
+      --text-soft:#6b7280;
+      --pill:#15803d;
+      --danger:#ef4444;
+      --radius-lg:18px;
+      --shadow-soft:0 18px 45px rgba(0,0,0,0.65);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #020617 0, #020617 40%, #00010a 100%);
-      color: var(--text-main);
-      line-height: 1.5;
-    }
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; }
-
-    .page { min-height: 100vh; display: flex; flex-direction: column; }
-
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      backdrop-filter: blur(18px);
-      background: linear-gradient(to bottom, rgba(2,6,23,0.96), rgba(2,6,23,0.8), transparent);
-      border-bottom: 1px solid rgba(30,64,175,0.7);
-    }
-    .nav-inner {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 0.75rem 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-    }
-    .logo-img-wrapper {
-      width: 40px;
-      height: 40px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: #020617;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 0 2px rgba(255,75,75,0.4);
-    }
-    .logo-img-wrapper img {
-      width: 120%;
-      height: auto;
-    }
-    .logo-text-main {
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      font-size: 1rem;
-      text-transform: uppercase;
-    }
-    .logo-text-sub {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-    .nav-links {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-    .nav-links a {
-      padding: 0.35rem 0.6rem;
-      border-radius: 999px;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-    .nav-links a:hover {
-      background: rgba(15,23,42,0.9);
-      color: var(--text-main);
-    }
-    .nav-cta {
-      padding: 0.4rem 0.95rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255,75,75,0.7);
-      background: linear-gradient(to right, rgba(255,75,75,0.25), rgba(255,75,75,0.05));
-      color: #fee2e2;
-      font-size: 0.8rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      cursor: pointer;
+    *{
+      box-sizing:border-box;
     }
 
-    main { flex: 1; }
-    .section {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 2.5rem 1.25rem;
-    }
-    @media (min-width: 1024px) {
-      .section { padding: 3.5rem 1.25rem; }
+    html,body{
+      margin:0;
+      padding:0;
+      height:100%;
+      font-family:"Inter",system-ui,-apple-system,Segoe UI,sans-serif;
+      background:
+        radial-gradient(circle at top, #020617 0, #020617 45%, #020617 60%, #000 100%);
+      color:var(--text-main);
     }
 
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr);
-      gap: 2rem;
-      padding-top: 2.5rem;
-      padding-bottom: 1.5rem;
+    body{
+      display:flex;
+      flex-direction:column;
     }
-    @media (min-width: 900px) {
-      .hero {
-        grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
-        align-items: stretch;
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    .page{
+      max-width:1160px;
+      margin:0 auto;
+      padding:20px 16px 72px;
+    }
+
+    /* NAVBAR */
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 0 12px;
+      position:sticky;
+      top:0;
+      z-index:40;
+      backdrop-filter:blur(20px);
+      background:linear-gradient(to bottom,rgba(3,6,23,0.96),rgba(3,6,23,0.85),transparent);
+    }
+    .nav-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .logo-circle{
+      width:36px;
+      height:36px;
+      border-radius:999px;
+      background:#020617;
+      border:1px solid rgba(148,163,184,0.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .logo-circle img{
+      width:25px;
+      height:25px;
+      object-fit:contain;
+    }
+    .nav-brand{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .nav-title{
+      font-size:15px;
+      font-weight:600;
+      letter-spacing:0.03em;
+    }
+    .nav-sub{
+      font-size:11px;
+      color:var(--text-soft);
+    }
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap:22px;
+      font-size:13px;
+      color:var(--text-muted);
+    }
+    .nav-links a{
+      padding:4px 0;
+      position:relative;
+    }
+    .nav-links a:hover{
+      color:#f9fafb;
+    }
+    .nav-links a::after{
+      content:"";
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:-4px;
+      height:2px;
+      border-radius:999px;
+      background:linear-gradient(to right,#4f46e5,#ec4899);
+      transform:scaleX(0);
+      transform-origin:center;
+      transition:transform 160ms ease-out;
+    }
+    .nav-links a:hover::after{
+      transform:scaleX(1);
+    }
+    .nav-cta{
+      padding:6px 16px;
+      border-radius:999px;
+      border:1px solid rgba(248,250,252,0.16);
+      font-size:12px;
+      font-weight:500;
+      color:#f9fafb;
+      background:radial-gradient(circle at top,#f87171 0,#fb7185 40%,#c026d3 100%);
+      box-shadow:0 18px 35px rgba(248,113,113,0.35);
+    }
+
+    /* HERO */
+    .hero{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: minmax(0,1.4fr) minmax(0,1.1fr);
+      gap:32px;
+      align-items:flex-start;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 12px;
+      font-size:11px;
+      border-radius:999px;
+      background:rgba(22,163,74,0.16);
+      color:#bbf7d0;
+      border:1px solid rgba(22,163,74,0.45);
+      margin-bottom:14px;
+    }
+    .pill-dot{
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:#22c55e;
+      box-shadow:0 0 0 4px rgba(34,197,94,0.55);
+    }
+    .hero-title{
+      font-size:34px;
+      line-height:1.15;
+      font-weight:800;
+      letter-spacing:-0.03em;
+      margin:0 0 12px;
+    }
+    .hero-title span.accent{
+      color:var(--accent);
+      text-shadow:0 0 18px rgba(239,68,68,0.55);
+    }
+    .hero-sub{
+      font-size:14px;
+      color:var(--text-muted);
+      max-width:520px;
+      margin-bottom:22px;
+    }
+    .hero-buttons{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .btn{
+      border-radius:999px;
+      padding:9px 18px;
+      font-size:13px;
+      font-weight:500;
+      border:1px solid transparent;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+    }
+    .btn-primary{
+      background:var(--accent);
+      color:#0b1120;
+      box-shadow:var(--shadow-soft);
+    }
+    .btn-outline{
+      background:rgba(15,23,42,0.75);
+      border-color:#1f2937;
+      color:var(--text-main);
+    }
+    .hero-bullets{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:6px;
+      font-size:12px;
+      color:var(--text-soft);
+    }
+    .hero-bullet{
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+    }
+    .hero-bullet span.icon{
+      margin-top:2px;
+      width:14px;
+      height:14px;
+      border-radius:4px;
+      border:1px solid rgba(156,163,175,0.5);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:9px;
+      color:#e5e7eb;
+    }
+
+    /* PANEL MODELOS */
+    .panel{
+      border-radius:var(--radius-lg);
+      background:radial-gradient(circle at top,#020617 0,#020617 45%,#020617 70%,#000 100%);
+      border:1px solid rgba(148,163,184,0.28);
+      box-shadow:var(--shadow-soft);
+      padding:14px 14px 18px;
+    }
+
+    .panel-tabs{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+      font-size:12px;
+    }
+    .pill-tab{
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid transparent;
+      background:#020617;
+      color:var(--text-soft);
+      cursor:pointer;
+    }
+    .pill-tab.active{
+      background:var(--accent-soft);
+      border-color:rgba(248,113,113,0.6);
+      color:#fecaca;
+    }
+
+    .models-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:6px;
+    }
+    .model-card{
+      border-radius:14px;
+      background:rgba(15,23,42,0.92);
+      border:1px solid rgba(75,85,99,0.65);
+      padding:10px 10px 11px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-height:120px;
+    }
+    .model-name{
+      font-size:13px;
+      font-weight:600;
+      margin-bottom:2px;
+    }
+    .model-cat{
+      font-size:11px;
+      color:#9ca3af;
+      margin-bottom:8px;
+    }
+    .model-meta{
+      font-size:10px;
+      color:#9ca3af;
+      display:flex;
+      justify-content:space-between;
+      gap:6px;
+    }
+    .model-meta span.label{
+      color:#6b7280;
+    }
+    .model-footer{
+      margin-top:6px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:11px;
+      color:#9ca3af;
+    }
+    .chip-ready{
+      padding:2px 8px;
+      border-radius:999px;
+      background:rgba(34,197,94,0.1);
+      color:#bbf7d0;
+      border:1px solid rgba(34,197,94,0.6);
+    }
+
+    /* SECCIÓN DISEÑADORES */
+    .section-title{
+      margin-top:54px;
+      margin-bottom:12px;
+      font-size:20px;
+      font-weight:700;
+      letter-spacing:-0.03em;
+    }
+    .section-sub{
+      font-size:13px;
+      color:var(--text-muted);
+      max-width:620px;
+      margin-bottom:18px;
+    }
+
+    .designer-layout{
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(0,1.1fr);
+      gap:20px;
+      align-items:flex-start;
+    }
+
+    .designer-card{
+      background:var(--bg-card);
+      border-radius:var(--radius-lg);
+      border:1px solid var(--border-subtle);
+      padding:16px 16px 18px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .designer-card h3{
+      margin:0 0 12px;
+      font-size:15px;
+      font-weight:600;
+    }
+
+    .helper{
+      font-size:11px;
+      color:var(--text-soft);
+      margin-bottom:10px;
+    }
+
+    .form-row{
+      margin-bottom:10px;
+      font-size:12px;
+    }
+    .form-row label{
+      display:block;
+      margin-bottom:4px;
+      color:#d1d5db;
+      font-size:11px;
+    }
+    .input, .select, .textarea{
+      width:100%;
+      padding:7px 9px;
+      border-radius:10px;
+      border:1px solid #111827;
+      background:#020617;
+      color:#e5e7eb;
+      font-family:inherit;
+      font-size:12px;
+    }
+    .select{
+      padding-right:24px;
+    }
+    .textarea{
+      min-height:70px;
+      resize:vertical;
+    }
+    .input:disabled,
+    .select:disabled,
+    .textarea:disabled{
+      opacity:0.4;
+      cursor:not-allowed;
+    }
+
+    .btn-sm{
+      font-size:11px;
+      padding:6px 10px;
+    }
+
+    .btn-full{
+      width:100%;
+    }
+
+    .btn-primary-soft{
+      background:#ef4444;
+      color:#fff7ed;
+      border:none;
+      box-shadow:0 15px 30px rgba(248,113,113,0.35);
+    }
+
+    .hint{
+      margin-top:6px;
+      font-size:11px;
+      color:var(--text-soft);
+    }
+
+    .disclaimer{
+      margin-top:40px;
+      font-size:10px;
+      color:var(--text-soft);
+      text-align:right;
+    }
+
+    @media (max-width:900px){
+      .hero{
+        grid-template-columns:minmax(0,1fr);
       }
-    }
-    .hero-left {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.25rem 0.6rem;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.85);
-      border: 1px solid rgba(255,75,75,0.6);
-      font-size: 0.72rem;
-      color: #fecaca;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-    .pill-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 0 8px rgba(34,197,94,0.3);
-    }
-    .hero-title {
-      font-size: clamp(2rem, 3vw + 1.2rem, 2.7rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-    .hero-title span {
-      color: var(--primary);
-    }
-    .hero-subtitle {
-      font-size: 0.98rem;
-      color: var(--text-muted);
-      max-width: 32rem;
-    }
-    .hero-ctas {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.7rem;
-      margin-top: 0.3rem;
-    }
-    .btn {
-      border-radius: 999px;
-      padding: 0.7rem 1.3rem;
-      font-size: 0.9rem;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      cursor: pointer;
-      border: none;
-    }
-    .btn-primary {
-      background: linear-gradient(to right, var(--primary), #fb7185);
-      color: #111827;
-      box-shadow: 0 16px 45px rgba(248,113,113,0.45);
-    }
-    .btn-outline {
-      border: 1px solid rgba(148,163,184,0.7);
-      background: rgba(15,23,42,0.85);
-      color: var(--text-main);
-    }
-    .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; }
-
-    .hero-metas {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.2rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 0.5rem;
-    }
-    .hero-meta-item strong {
-      display: block;
-      color: var(--text-main);
-      font-size: 0.9rem;
-    }
-
-    .hero-right { display: none; }
-    @media (min-width: 900px) { .hero-right { display: block; } }
-
-    .mock-card {
-      background: radial-gradient(circle at top left, rgba(255,75,75,0.22), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(248,113,113,0.25), transparent 55%),
-                  #020617;
-      border-radius: 26px;
-      border: 1px solid rgba(148,163,184,0.4);
-      padding: 1.3rem;
-      box-shadow: var(--shadow-soft);
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .mock-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-    .mock-tabs {
-      display: inline-flex;
-      background: rgba(15,23,42,0.8);
-      padding: 0.15rem;
-      border-radius: 999px;
-      gap: 0.2rem;
-    }
-    .mock-tab {
-      padding: 0.25rem 0.7rem;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      cursor: pointer;
-    }
-    .mock-tab.active {
-      background: rgba(15,23,42,0.95);
-      color: #fee2e2;
-    }
-    .mock-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.7rem;
-      margin-top: 0.2rem;
-      flex: 1;
-    }
-    .mock-card-item {
-      border-radius: 14px;
-      padding: 0.6rem;
-      background: rgba(15,23,42,0.9);
-      border: 1px solid rgba(51,65,85,0.9);
-      font-size: 0.7rem;
-    }
-    .mock-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2rem;
-      background: rgba(15,23,42,0.85);
-      border-radius: 999px;
-      padding: 0.2rem 0.45rem;
-      font-size: 0.65rem;
-      margin-top: 0.4rem;
-    }
-    .mock-stat-row {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 0.35rem;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
-    .section-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 0.4rem;
-    }
-    .section-subtitle {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      max-width: 34rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .steps {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 1rem;
-    }
-    @media (min-width: 800px) {
-      .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-    .step-card {
-      background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
-      border-radius: var(--radius-lg);
-      border: var(--border-subtle);
-      padding: 1rem;
-    }
-    .step-badge {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      background: rgba(255,75,75,0.18);
-      border: 1px solid rgba(255,75,75,0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      color: #fecaca;
-      margin-bottom: 0.5rem;
-    }
-    .step-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 0.3rem;
-    }
-    .step-text {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .marketplace {
-      margin-top: 0.5rem;
-      border-radius: 24px;
-      padding: 1.3rem;
-      background: linear-gradient(to bottom, rgba(15,23,42,0.96), rgba(15,23,42,0.98));
-      border: 1px solid rgba(75,85,99,0.9);
-      box-shadow: var(--shadow-soft);
-    }
-    .marketplace-header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .marketplace-filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      font-size: 0.8rem;
-    }
-    .filter-chip {
-      border-radius: 999px;
-      padding: 0.35rem 0.8rem;
-      border: 1px solid rgba(148,163,184,0.7);
-      background: rgba(15,23,42,0.8);
-      cursor: pointer;
-    }
-    .filter-chip.active {
-      background: var(--primary-soft);
-      border-color: rgba(255,75,75,0.9);
-      color: #fee2e2;
-    }
-    .marketplace-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0.9rem;
-    }
-    @media (min-width: 640px) {
-      .marketplace-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (min-width: 980px) {
-      .marketplace-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-
-    .design-card {
-      background: linear-gradient(to bottom, #020617, #020617);
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(51,65,85,0.9);
-      padding: 0.8rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-    }
-    .design-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 18px 40px rgba(15,23,42,0.8);
-      border-color: rgba(255,75,75,0.9);
-    }
-    .design-thumb {
-      border-radius: 14px;
-      height: 120px;
-      background: radial-gradient(circle at top, rgba(255,75,75,0.35), rgba(15,23,42,0.85)),
-                  radial-gradient(circle at bottom, rgba(248,113,113,0.25), rgba(15,23,42,1));
-      margin-bottom: 0.5rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .design-thumb-inner {
-      position: absolute;
-      inset: 12%;
-      border-radius: 20px;
-      border: 1px dashed rgba(148,163,184,0.5);
-      backdrop-filter: blur(4px);
-      background: linear-gradient(135deg, rgba(15,23,42,0.8), rgba(15,23,42,0.2));
-    }
-    .design-name { font-size: 0.9rem; font-weight: 600; }
-    .design-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-    }
-    .design-tag {
-      border-radius: 999px;
-      padding: 0.18rem 0.5rem;
-      font-size: 0.7rem;
-      background: rgba(15,23,42,0.85);
-      border: 1px solid rgba(75,85,99,0.8);
-    }
-    .design-price {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #f9fafb;
-    }
-    .design-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.2rem;
-      margin-top: 0.35rem;
-      font-size: 0.7rem;
-    }
-    .design-badge {
-      border-radius: 999px;
-      padding: 0.12rem 0.45rem;
-      background: rgba(15,23,42,0.9);
-      border: 1px solid rgba(55,65,81,0.8);
-    }
-
-    .designer-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 1.2rem;
-      margin-top: 0.5rem;
-    }
-    @media (min-width: 880px) {
-      .designer-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr); }
-    }
-    .designer-card {
-      border-radius: 22px;
-      padding: 1.2rem;
-      background: linear-gradient(to bottom right, rgba(15,23,42,0.97), rgba(24,24,35,0.98));
-      border: 1px solid rgba(75,85,99,0.9);
-      box-shadow: var(--shadow-soft);
-    }
-    .designer-list {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0.7rem;
-      margin-top: 0.6rem;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-    .designer-list li {
-      display: flex;
-      gap: 0.4rem;
-    }
-    .designer-dot {
-      margin-top: 0.2rem;
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--primary);
-    }
-
-    .form {
-      display: flex;
-      flex-direction: column;
-      gap: 0.55rem;
-      margin-top: 0.5rem;
-      font-size: 0.86rem;
-    }
-    .form-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-    .form label {
-      color: var(--text-muted);
-      font-size: 0.78rem;
-    }
-    .input, select, textarea {
-      border-radius: 12px;
-      border: 1px solid rgba(75,85,99,0.9);
-      background: rgba(15,23,42,0.95);
-      padding: 0.5rem 0.7rem;
-      color: var(--text-main);
-      font: inherit;
-    }
-    .input::placeholder, textarea::placeholder {
-      color: rgba(148,163,184,0.8);
-    }
-    textarea { resize: vertical; min-height: 70px; }
-    .helper { font-size: 0.7rem; color: var(--text-muted); }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15,23,42,0.82);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-      padding: 1rem;
-    }
-    .modal {
-      max-width: 480px;
-      width: 100%;
-      border-radius: 22px;
-      background: #020617;
-      border: 1px solid rgba(148,163,184,0.7);
-      box-shadow: 0 24px 80px rgba(15,23,42,0.95);
-      padding: 1.2rem;
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 0.75rem;
-      margin-bottom: 0.5rem;
-    }
-    .modal-title { font-size: 1rem; font-weight: 600; }
-    .modal-close {
-      border-radius: 999px;
-      border: 1px solid rgba(75,85,99,0.8);
-      background: rgba(15,23,42,0.9);
-      width: 26px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      cursor: pointer;
-      color: var(--text-muted);
-    }
-    .modal-body {
-      font-size: 0.86rem;
-      color: var(--text-muted);
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 0.7rem;
-    }
-    .modal-body-rows { display: grid; gap: 0.25rem; }
-    .modal-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-    }
-    .modal-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.4rem;
-      margin-top: 0.4rem;
-    }
-    .modal-actions {
-      display: flex;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      padding: 0.7rem 1rem;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.97);
-      border: 1px solid rgba(34,197,94,0.7);
-      color: #bbf7d0;
-      font-size: 0.8rem;
-      display: none;
-      z-index: 60;
-      box-shadow: 0 18px 45px rgba(15,23,42,0.9);
-    }
-
-    footer {
-      border-top: 1px solid rgba(30,64,175,0.8);
-      background: radial-gradient(circle at top, rgba(15,23,42,0.97), #020617);
-      margin-top: 2rem;
-    }
-    .footer-inner {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 1.4rem 1.25rem 1.8rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 0.7rem;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-    }
-    .footer-inner a {
-      text-decoration: underline;
-      text-decoration-color: rgba(148,163,184,0.5);
+      .designer-layout{
+        grid-template-columns:minmax(0,1fr);
+      }
+      .panel{
+        margin-top:10px;
+      }
+      .nav-links{
+        display:none;
+      }
     }
   </style>
 </head>
 <body>
-<div class="page">
-  <header class="navbar">
-    <div class="nav-inner">
-      <div class="logo">
-        <div class="logo-img-wrapper">
-          <img src="logo-telport.jpg" alt="Logo Telport 3D">
+  <div class="page">
+    <!-- NAVBAR -->
+    <header class="nav">
+      <div class="nav-left">
+        <div class="logo-circle">
+          <!-- usa tu logo real en el repo -->
+          <img src="logo-telport.jpg" alt="Telport 3D logo">
         </div>
-        <div>
-          <div class="logo-text-main">TELPORT 3D</div>
-          <div class="logo-text-sub">Impresión 3D bajo demanda</div>
+        <div class="nav-brand">
+          <div class="nav-title">TELPORT 3D</div>
+          <div class="nav-sub">Impresión 3D bajo demanda</div>
         </div>
       </div>
       <nav class="nav-links">
-        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#funciona">Cómo funciona</a>
         <a href="#marketplace">Modelos</a>
         <a href="#disenadores">Diseñadores</a>
-        <button class="nav-cta" onclick="scrollToPreRegistro()">
-          <span>Acceso anticipado</span> →
-        </button>
       </nav>
-    </div>
-  </header>
+      <a href="#acceso" class="nav-cta">Acceso anticipado →</a>
+    </header>
 
-  <main>
-    <section class="section hero">
-      <div class="hero-left">
-        <div class="pill">
-          <span class="pill-dot"></span>
-          Plataforma en construcción · MVP
+    <!-- HERO -->
+    <main>
+      <section id="marketplace" class="hero">
+        <div>
+          <div class="pill">
+            <span class="pill-dot"></span>
+            PLATAFORMA EN CONSTRUCCIÓN · MVP
+          </div>
+          <h1 class="hero-title">
+            Diseños 3D que se <span class="accent">imprimen directamente</span> desde la web.
+          </h1>
+          <p class="hero-sub">
+            Los diseñadores suben sus modelos 3D a Telport y los usuarios generan
+            una orden de impresión online. Sin descargas, sin archivos dando vueltas:
+            del diseño al objeto físico.
+          </p>
+
+          <div class="hero-buttons">
+            <a href="#disenadores" class="btn btn-primary">Soy diseñador 3D</a>
+            <a href="#marketplace" class="btn btn-outline">Quiero mandar a imprimir</a>
+          </div>
+
+          <div class="hero-bullets">
+            <div class="hero-bullet">
+              <span class="icon">●</span>
+              <span>Impresión directa: todo el flujo ocurre en Telport, listo para conectar con centros de impresión.</span>
+            </div>
+            <div class="hero-bullet">
+              <span class="icon">●</span>
+              <span>Latam first: foco inicial en centros de impresión en Argentina.</span>
+            </div>
+            <div class="hero-bullet">
+              <span class="icon">●</span>
+              <span>MVP: el backend de órdenes está listo para el siguiente paso.</span>
+            </div>
+          </div>
         </div>
-        <h1 class="hero-title">
-          Diseños 3D que se imprimen <span>directamente desde la web</span>.
-        </h1>
-        <p class="hero-subtitle">
-          Los diseñadores suben sus modelos 3D a Telport y los usuarios generan una orden de impresión
-          online. Sin descargas, sin archivos dando vueltas: del diseño al objeto físico.
+
+        <!-- Panel modelos -->
+        <aside class="panel">
+          <div class="panel-tabs">
+            <button class="pill-tab active" type="button">Modelos</button>
+            <button class="pill-tab" type="button" disabled>Órdenes</button>
+          </div>
+
+          <div class="models-grid" id="models-grid">
+            <!-- Se llena por JS con const designs -->
+          </div>
+
+          <p class="disclaimer">v0.1 · Todo es mock: listo para conectarlo a un sistema real de impresión.</p>
+        </aside>
+      </section>
+
+      <!-- Sección diseñadores -->
+      <section id="disenadores">
+        <h2 class="section-title">Para diseñadores 3D</h2>
+        <p class="section-sub">
+          Vos diseñás. Telport imprime. El objetivo es que moneticés tus modelos
+          sin tener que compartir archivos ni gestionar la parte operativa de la impresión.
         </p>
-        <div class="hero-ctas">
-          <button class="btn btn-primary" onclick="scrollToDisenadores()">
-            Soy diseñador 3D
-          </button>
-          <button class="btn btn-outline" onclick="scrollToMarketplace()">
-            Quiero mandar a imprimir
-          </button>
-        </div>
-        <div class="hero-metas">
-          <div class="hero-meta-item">
-            <strong>Impresión directa</strong>
-            Todo el flujo ocurre en Telport
-          </div>
-          <div class="hero-meta-item">
-            <strong>Latam first</strong>
-            Foco inicial: centros de impresión en Argentina
-          </div>
-          <div class="hero-meta-item">
-            <strong>MVP</strong>
-            Front listo para conectar backend de órdenes
-          </div>
-        </div>
-      </div>
 
-      <div class="hero-right">
-        <div class="mock-card">
-          <div class="mock-header">
-            <div>
-              <div style="font-size:0.8rem;font-weight:600;">Panel Telport · Beta</div>
-              <div style="font-size:0.75rem;color:var(--text-muted);">Vista combinada diseñador / órdenes de impresión</div>
-            </div>
-            <div class="mock-tabs">
-              <div class="mock-tab active">Modelos</div>
-              <div class="mock-tab">Órdenes</div>
-            </div>
-          </div>
-          <div class="mock-grid">
-            <div class="mock-card-item">
-              <div style="font-size:0.8rem;font-weight:600;">Soporte de auriculares</div>
-              <div style="font-size:0.7rem;color:var(--text-muted);">Gadget · PLA</div>
-              <div class="mock-stat-row"><span>Órdenes</span><span>57</span></div>
-              <div class="mock-stat-row"><span>Impreso en</span><span>3 centros</span></div>
-            </div>
-            <div class="mock-card-item">
-              <div style="font-size:0.8rem;font-weight:600;">Maceta paramétrica</div>
-              <div style="font-size:0.7rem;color:var(--text-muted);">Hogar · Decoración</div>
-              <div class="mock-stat-row"><span>Royalties</span><span>US$ 124</span></div>
-              <div class="mock-stat-row"><span>Rating</span><span>4.8★</span></div>
-            </div>
-            <div class="mock-card-item">
-              <div style="font-size:0.8rem;font-weight:600;">Portallaves pared</div>
-              <div style="font-size:0.7rem;color:var(--text-muted);">Hogar · PLA</div>
-              <div class="mock-chip"><span>Modelo listo para imprimir</span></div>
-            </div>
-            <div class="mock-card-item">
-              <div style="font-size:0.8rem;font-weight:600;">Figura low-poly</div>
-              <div style="font-size:0.7rem;color:var(--text-muted);">Coleccionable · Resina</div>
-              <div class="mock-chip"><span>Entrega estimada 72h</span></div>
-            </div>
-          </div>
-          <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;">
-            <span>Todo es mock: listo para conectarlo a un sistema real de impresión.</span>
-            <span style="font-size:0.7rem;color:var(--primary);">v0.1</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="como-funciona">
-      <h2 class="section-title">Cómo funciona Telport 3D</h2>
-      <p class="section-subtitle">
-        Una única plataforma para publicar modelos 3D y transformarlos en objetos físicos,
-        gestionando órdenes de impresión en centros asociados.
-      </p>
-      <div class="steps">
-        <div class="step-card">
-          <div class="step-badge">1</div>
-          <div class="step-title">El diseñador sube su modelo</div>
-          <p class="step-text">
-            Carga el archivo 3D (STL, OBJ, etc.), define categoría, descripción
-            y precio por impresión. El archivo nunca se descarga: se usa sólo para imprimir.
-          </p>
-        </div>
-        <div class="step-card">
-          <div class="step-badge">2</div>
-          <div class="step-title">El usuario genera una orden</div>
-          <p class="step-text">
-            Elige el modelo, define material, color y tamaño. Confirma la orden y
-            Telport envía el job al centro de impresión disponible.
-          </p>
-        </div>
-        <div class="step-card">
-          <div class="step-badge">3</div>
-          <div class="step-title">Impresión y entrega</div>
-          <p class="step-text">
-            El backend coordina la cola de impresión, calcula costos,
-            paga el royalty al diseñador y gestiona el envío al usuario final.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="marketplace">
-      <div class="marketplace">
-        <div class="marketplace-header">
-          <div>
-            <h2 class="section-title" style="margin-bottom:0;">Modelos listos para imprimir (mock)</h2>
-            <p class="section-subtitle" style="margin-bottom:0.4rem;">
-              Ejemplos de cómo se vería el catálogo. Los datos se generan en JavaScript, listos para
-              reemplazar por una API real de Telport.
-            </p>
-          </div>
-          <div class="marketplace-filters" id="filters">
-            <button class="filter-chip active" data-category="all">Todos</button>
-            <button class="filter-chip" data-category="Gadgets">Gadgets</button>
-            <button class="filter-chip" data-category="Hogar">Hogar</button>
-            <button class="filter-chip" data-category="Figuras">Figuras</button>
-            <button class="filter-chip" data-category="Organización">Organización</button>
-          </div>
-        </div>
-        <div class="marketplace-grid" id="designGrid"></div>
-      </div>
-    </section>
-
-    <section class="section" id="disenadores">
-      <h2 class="section-title">Para diseñadores 3D</h2>
-      <p class="section-subtitle">
-        Vos diseñás, Telport imprime. El objetivo es que moneticés tus modelos sin tener que
-        compartir archivos ni gestionar la parte operativa de la impresión.
-      </p>
-
-      <div class="designer-grid">
-        <div class="designer-card">
-          <h3 style="font-size:1rem;font-weight:600;margin-bottom:0.4rem;">Qué va a permitir tu panel</h3>
-          <ul class="designer-list">
-            <li>
-              <div class="designer-dot"></div>
-              <div>Subir y gestionar tu catálogo de modelos 3D en un solo lugar.</div>
-            </li>
-            <li>
-              <div class="designer-dot"></div>
-              <div>Definir precio por impresión, sin necesidad de vender el archivo.</div>
-            </li>
-            <li>
-              <div class="designer-dot"></div>
-              <div>Ver métricas: órdenes, centros donde se imprimió, ingresos acumulados.</div>
-            </li>
-            <li>
-              <div class="designer-dot"></div>
-              <div>Recibir tus royalties automáticamente cada vez que se imprime tu diseño.</div>
-            </li>
-          </ul>
-          <p class="helper" style="margin-top:0.6rem;">
-            Abajo simulamos un formulario de carga de diseño. Por ahora sólo impacta en el grid
-            de esta landing, pero es el mismo flujo que luego se conectaría al backend real.
-          </p>
-        </div>
-
-        <div class="designer-card" id="pre-registro">
-          <h3 style="font-size:1rem;font-weight:600;margin-bottom:0.4rem;">Simulá subir un diseño</h3>
-
-          <p id="auth-info" class="helper" style="margin-bottom:0.4rem;">
-            Iniciá sesión con Google para poder subir modelos de prueba.
-          </p>
-          <button type="button" class="btn btn-outline btn-sm" id="btn-auth-google" style="margin-bottom:0.8rem;">
-            Iniciar sesión con Google
-          </button>
-
-          <form class="form" id="formNuevoDesign">
-            <div class="form-row">
-              <label>Nombre del diseño</label>
-              <input class="input" type="text" id="nuevoNombre" placeholder="Ej: Soporte minimalista para celular" required>
-            </div>
-            <div class="form-row">
-              <label>Categoría</label>
-              <select id="nuevoCategoria" required>
-                <option value="Gadgets">Gadgets</option>
-                <option value="Hogar">Hogar</option>
-                <option value="Figuras">Figuras</option>
-                <option value="Organización">Organización</option>
-              </select>
-            </div>
-            <div class="form-row">
-              <label>Precio por impresión (USD)</label>
-              <input class="input" type="number" step="0.01" min="0" id="nuevoPrecio" placeholder="Ej: 9.90" required>
-            </div>
-            <div class="form-row">
-              <label>Descripción corta</label>
-              <textarea id="nuevoDescripcion" placeholder="Breve descripción del modelo y usos recomendados."></textarea>
-            </div>
-            <div class="form-row">
-              <label>Archivo 3D (mock)</label>
-              <input class="input" type="file" accept=".stl,.obj,.3mf" />
-              <span class="helper">
-                En el MVP esto se simula; en producción el archivo se usará sólo para generar las impresiones,
-                no para descarga.
-              </span>
-            </div>
-            <button type="submit" class="btn btn-primary" style="margin-top:0.3rem;">
-              Agregar al catálogo (mock)
-            </button>
+        <div class="designer-layout">
+          <!-- Columna izquierda: beneficios -->
+          <div class="designer-card">
+            <h3>Qué va a permitir tu panel</h3>
+            <ul style="margin:0 0 12px 16px; padding:0; font-size:12px; color:var(--text-muted); display:flex; flex-direction:column; gap:6px;">
+              <li>Subir y gestionar tu catálogo de modelos 3D en un solo lugar.</li>
+              <li>Definir precio por impresión, sin necesidad de vender el archivo.</li>
+              <li>Ver métricas: órdenes, centros donde se imprimió, ingresos acumulados.</li>
+              <li>Recibir tus royalties automáticamente cada vez que se imprime tu diseño.</li>
+            </ul>
             <p class="helper">
-              Al enviar, el diseño aparece en la sección “Modelos listos para imprimir” como ejemplo de flujo.
+              Abajo simulamos un formulario de carga de diseño. Por ahora sólo impacta en el grid de esta landing,
+              pero es el mismo flujo que luego se conectará al backend real.
             </p>
-          </form>
+          </div>
 
-          <hr style="border:none;border-top:1px solid rgba(55,65,81,0.9);margin:0.9rem 0;" />
+          <!-- Columna derecha: formulario + login -->
+          <div class="designer-card" id="pre-registro">
+            <h3>Simulá subir un diseño</h3>
+            <p id="auth-info" class="helper">
+              Iniciá sesión con Google para poder subir diseños.
+            </p>
+            <button type="button" class="btn btn-outline btn-sm" id="btn-auth-google" style="margin-bottom:10px;">
+              Iniciar sesión con Google
+            </button>
 
-          <h3 style="font-size:0.95rem;font-weight:600;margin-bottom:0.4rem;">Acceso anticipado</h3>
-          <form class="form" id="formPreRegistro">
-            <div class="form-row">
-              <label>Correo electrónico</label>
-              <input class="input" type="email" id="preEmail" placeholder="tuemail@ejemplo.com" required>
+            <form class="form" id="formNuevoDesign">
+              <div class="form-row">
+                <label for="nuevoNombre">Nombre del diseño</label>
+                <input class="input" id="nuevoNombre" type="text"
+                       placeholder="Ej: Soporte minimalista para celular" required>
+              </div>
+
+              <div class="form-row">
+                <label for="nuevoCategoria">Categoría</label>
+                <select class="select" id="nuevoCategoria" required>
+                  <option value="Gadgets">Gadgets</option>
+                  <option value="Hogar">Hogar</option>
+                  <option value="Figuras">Figuras</option>
+                  <option value="Organización">Organización</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label for="nuevoPrecio">Precio por impresión (USD)</label>
+                <input class="input" id="nuevoPrecio" type="number" step="0.01" min="0"
+                       placeholder="Ej: 9.90" required>
+              </div>
+
+              <div class="form-row">
+                <label for="nuevoDesc">Descripción corta</label>
+                <textarea class="textarea" id="nuevoDesc"
+                          placeholder="Breve descripción del modelo y usos recomendados."></textarea>
+              </div>
+
+              <div class="form-row">
+                <label for="nuevoArchivo">Archivo 3D (mock)</label>
+                <input class="input" id="nuevoArchivo" type="file" disabled>
+                <p class="hint">
+                  En el MVP esto se simula; en producción el archivo se usará sólo para generar las impresiones,
+                  no para descarga.
+                </p>
+              </div>
+
+              <button type="submit" class="btn btn-primary-soft btn-full">
+                Agregar al catálogo (mock)
+              </button>
+
+              <p class="hint">
+                Al enviar, el diseño aparece en la sección "Modelos listos para imprimir"
+                como ejemplo de flujo.
+              </p>
+            </form>
+          </div>
+        </div>
+
+        <!-- Acceso anticipado -->
+        <div id="acceso" style="margin-top:38px;">
+          <h3 style="font-size:15px; margin:0 0 10px;">Acceso anticipado</h3>
+          <p class="helper" style="margin-bottom:8px;">
+            Dejamos un formulario simple para early adopters. En la versión final esto será un onboarding completo
+            para centros de impresión y diseñadores.
+          </p>
+          <form style="display:grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1.1fr); gap:10px; max-width:540px;">
+            <div class="form-row" style="margin-bottom:0;">
+              <label for="emailAcceso">Correo electrónico</label>
+              <input class="input" id="emailAcceso" type="email" placeholder="tucorreo@ejemplo.com">
             </div>
-            <div class="form-row">
-              <label>Rol</label>
-              <select id="preRol">
-                <option value="disenador">Soy diseñador 3D</option>
-                <option value="usuario">Quiero mandar a imprimir modelos</option>
-                <option value="centro">Tengo centro de impresión</option>
+            <div class="form-row" style="margin-bottom:0;">
+              <label for="rolAcceso">Rol</label>
+              <select class="select" id="rolAcceso">
+                <option value="disenador">Diseñador 3D</option>
+                <option value="centro">Centro de impresión</option>
+                <option value="ambos">Ambos</option>
               </select>
             </div>
-            <button type="submit" class="btn btn-outline btn-sm" style="align-self:flex-start;">
-              Quiero que me avisen cuando esté listo
-            </button>
           </form>
         </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="footer-inner">
-      <div>© <span id="year"></span> Telport 3D. MVP de concepto.</div>
-      <div>
-        Proyecto creado en Salta, Argentina · Contacto: <a href="mailto:info@telport3d.com">info@telport3d.com</a>
-      </div>
-    </div>
-  </footer>
-</div>
-
-<div class="modal-backdrop" id="modalBackdrop">
-  <div class="modal">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="modalTitle">Nombre diseño</div>
-        <div style="font-size:0.78rem;color:var(--text-muted);" id="modalCategory">Categoría</div>
-      </div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-body-rows">
-        <div class="modal-row">
-          <span>Tipo de servicio</span>
-          <span id="modalUsage">Impresión bajo demanda</span>
-        </div>
-        <div class="modal-row">
-          <span>Precio por impresión</span>
-          <span id="modalPrice">US$ 0.00</span>
-        </div>
-        <div class="modal-row">
-          <span>Tiempo estimado (mock)</span>
-          <span id="modalEta">48 h</span>
-        </div>
-      </div>
-      <p id="modalDescription">
-        Descripción del modelo. En el futuro esta info vendrá directamente del diseñador y se
-        usará para cotizar mejor la impresión.
-      </p>
-      <p class="helper">
-        Acciones simuladas para demo: todavía no hay backend. Pensado para mostrar el flujo
-        a socios, centros de impresión o inversores.
-      </p>
-    </div>
-    <div class="modal-footer">
-      <div class="modal-actions">
-        <button class="btn btn-primary btn-sm" onclick="actionImprimir()">
-          Pedir impresión
-        </button>
-      </div>
-      <div style="font-size:0.7rem;color:var(--text-muted);">
-        Estado backend: <span style="color:#facc15;">por conectar</span>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
-</div>
 
-<div class="toast" id="toast"></div>
+  <!-- TOAST simple -->
+  <div id="toast" class="toast" style="
+      position:fixed;
+      left:50%;
+      bottom:22px;
+      transform:translateX(-50%);
+      padding:8px 14px;
+      font-size:11px;
+      border-radius:999px;
+      background:#111827;
+      color:#e5e7eb;
+      border:1px solid rgba(148,163,184,0.6);
+      box-shadow:0 18px 35px rgba(0,0,0,0.55);
+      display:none;
+      z-index:60;">
+    Diseño agregado al catálogo (mock).
+  </div>
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script>
+    // ===== MOCK DE DISEÑOS INICIALES =====
+    const designs = [
+      {
+        id: 1,
+        name: "Soporte articulado para celular",
+        category: "Gadgets",
+        price: 8.9,
+        tags: ["PLA", "Escritorio"],
+        usage: "Impresión bajo demanda",
+        eta: "48 h",
+        description: "Soporte regulable para celular, optimizado para impresión FDM. La orden se envía directamente a un centro de impresión asociado."
+      },
+      {
+        id: 2,
+        name: "Maceta paramétrica hexagonal",
+        category: "Hogar",
+        price: 11.5,
+        tags: ["Decoración", "Interior"],
+        usage: "Impresión bajo demanda",
+        eta: "72 h",
+        description: "Maceta de diseño paramétrico con drenaje optimizado. Ideal para PLA y PETG en tamaños medianos."
+      },
+      {
+        id: 3,
+        name: "Organizador modular de escritorio",
+        category: "Organización",
+        price: 14.9,
+        tags: ["Oficina", "Setup"],
+        usage: "Impresión bajo demanda",
+        eta: "72 h",
+        description: "Módulos apilables para organizar cables, lápices y accesorios de escritorio."
+      },
+      {
+        id: 4,
+        name: "Figura low-poly",
+        category: "Figuras",
+        price: 19.9,
+        tags: ["Coleccionable", "Resina"],
+        usage: "Impresión bajo demanda",
+        eta: "Entrega estimada 72h",
+        description: "Figura de estilo low-poly pensada para resina. Ideal para pintado posterior."
+      }
+    ];
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyB0P3VJuZGFcU_wHQ0QKGTtLjmETb0zyo",
-    authDomain: "telport3d.firebaseapp.com",
-    projectId: "telport3d",
-    storageBucket: "telport3d.firebasestorage.app",
-    messagingSenderId: "171341331188",
-    appId: "1:171341331188:web:b7c7362e0268b0043dbca1"
-  };
+    function renderDesigns(){
+      const container = document.getElementById("models-grid");
+      if(!container) return;
+      container.innerHTML = "";
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const provider = new firebase.auth.GoogleAuthProvider();
+      designs.forEach(d => {
+        const card = document.createElement("div");
+        card.className = "model-card";
 
-  let currentUser = null;
+        card.innerHTML = `
+          <div>
+            <div class="model-name">${d.name}</div>
+            <div class="model-cat">${d.category}</div>
+            <div class="model-meta">
+              <span><span class="label">Precio:</span> US$ ${d.price.toFixed(2)}</span>
+              <span><span class="label">ETA:</span> ${d.eta}</span>
+            </div>
+          </div>
+          <div class="model-footer">
+            <span>${d.usage}</span>
+            <span class="chip-ready">Listo para imprimir</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
 
-  function signInWithGoogle() {
-    auth.signInWithPopup(provider)
-      .then((result) => {
-        console.log("Login ok:", result.user);
-      })
-      .catch((err) => {
-        console.error(err);
-        if (typeof showToast === "function") {
-          showToast("No se pudo iniciar sesión con Google.");
-        } else {
-          alert("No se pudo iniciar sesión con Google.");
+    function showToast(msg){
+      const toast = document.getElementById("toast");
+      if(!toast) return;
+      toast.textContent = msg;
+      toast.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => {
+        toast.style.display = "none";
+      }, 2600);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderDesigns();
+
+      const form = document.getElementById("formNuevoDesign");
+      if(form){
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const nombre = document.getElementById("nuevoNombre").value.trim();
+          const cat    = document.getElementById("nuevoCategoria").value;
+          const precio = parseFloat(document.getElementById("nuevoPrecio").value || "0");
+          const desc   = document.getElementById("nuevoDesc").value.trim();
+
+          if(!nombre) return;
+
+          designs.unshift({
+            id: Date.now(),
+            name: nombre,
+            category: cat,
+            price: isNaN(precio) ? 0 : precio,
+            tags: [],
+            usage: "Modelo listo para imprimir (mock)",
+            eta: "48 h",
+            description: desc || ""
+          });
+
+          renderDesigns();
+          showToast("Diseño agregado al catálogo (mock).");
+          form.reset();
+        });
+      }
+    });
+  </script>
+
+  <!-- === FIREBASE AUTH (GOOGLE) === -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8OP3VJuZGFcU_wHQ0QKGTGLtjmETb0zyo",
+      authDomain: "telport3d.firebaseapp.com",
+      projectId: "telport3d",
+      storageBucket: "telport3d.firebasestorage.app",
+      messagingSenderId: "171341331188",
+      appId: "1:171341331188:web:b7c7362e0268b0403dbca1"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    function getDomAuth(){
+      const formNuevo = document.getElementById("formNuevoDesign");
+      const authInfo  = document.getElementById("auth-info");
+      const authBtn   = document.getElementById("btn-auth-google");
+      const fileInput = document.getElementById("nuevoArchivo");
+      return { formNuevo, authInfo, authBtn, fileInput };
+    }
+
+    function bloquearFormulario(){
+      const { formNuevo, fileInput } = getDomAuth();
+      if(!formNuevo) return;
+      [...formNuevo.elements].forEach(el => {
+        if(el.type !== "button" && el.type !== "submit") el.disabled = true;
+      });
+      if(fileInput) fileInput.disabled = true;
+    }
+
+    function habilitarFormulario(){
+      const { formNuevo, fileInput } = getDomAuth();
+      if(!formNuevo) return;
+      [...formNuevo.elements].forEach(el => {
+        el.disabled = false;
+      });
+      if(fileInput) fileInput.disabled = true; // seguimos simulando archivo
+    }
+
+    function updateUiForAuth(user){
+      const { authInfo, authBtn } = getDomAuth();
+      if(!authInfo || !authBtn) return;
+
+      if(user){
+        authInfo.textContent = `Conectado como ${user.displayName || user.email}`;
+        authBtn.textContent  = "Cerrar sesión";
+        habilitarFormulario();
+      }else{
+        authInfo.textContent = "Iniciá sesión con Google para poder subir diseños.";
+        authBtn.textContent  = "Iniciar sesión con Google";
+        bloquearFormulario();
+      }
+    }
+
+    auth.onAuthStateChanged(user => {
+      console.log("onAuthStateChanged:", user ? user.email : "sin usuario");
+      updateUiForAuth(user);
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const { authBtn } = getDomAuth();
+      console.log("DOM listo, authBtn =", authBtn);
+      updateUiForAuth(auth.currentUser || null);
+
+      if(!authBtn) return;
+
+      authBtn.addEventListener("click", async () => {
+        try{
+          if(auth.currentUser){
+            console.log("Cerrando sesión…");
+            await auth.signOut();
+          }else{
+            console.log("Abriendo popup de Google…");
+            const result = await auth.signInWithPopup(provider);
+            console.log("Login OK:", result.user.email);
+            updateUiForAuth(result.user);
+          }
+        }catch(err){
+          console.error("Error en login/logout:", err);
+          alert("Hubo un problema con Google Sign-In. Revisá la consola para más detalle.");
         }
       });
-  }
-
-  function signOut() {
-    auth.signOut();
-  }
-
-  auth.onAuthStateChanged((user) => {
-    currentUser = user;
-    updateUiForAuth(user);
-  });
-
-  function updateUiForAuth(user) {
-    const formNuevo = document.getElementById("formNuevoDesign");
-    const authInfo = document.getElementById("auth-info");
-    const authBtn = document.getElementById("btn-auth-google");
-
-    if (!formNuevo || !authInfo || !authBtn) return;
-
-    if (user) {
-      [...formNuevo.elements].forEach(el => el.disabled = false);
-      authInfo.textContent = `Conectado como ${user.displayName || user.email}`;
-      authBtn.textContent = "Cerrar sesión";
-      authBtn.onclick = signOut;
-    } else {
-      [...formNuevo.elements].forEach(el => {
-        if (el.type !== "button" && el.type !== "submit") el.disabled = true;
-      });
-      authInfo.textContent = "Iniciá sesión con Google para poder subir diseños.";
-      authBtn.textContent = "Iniciar sesión con Google";
-      authBtn.onclick = signInWithGoogle;
-    }
-  }
-</script>
-
-<script>
-  const designs = [
-    {
-      id: 1,
-      name: "Soporte articulado para celular",
-      category: "Gadgets",
-      price: 8.9,
-      tags: ["PLA", "Escritorio"],
-      usage: "Impresión bajo demanda",
-      eta: "48 h",
-      description: "Soporte regulable para celular, optimizado para impresión FDM. La orden se envía directamente a un centro de impresión asociado."
-    },
-    {
-      id: 2,
-      name: "Maceta paramétrica hexagonal",
-      category: "Hogar",
-      price: 11.5,
-      tags: ["Decoración", "Interior"],
-      usage: "Impresión bajo demanda",
-      eta: "72 h",
-      description: "Maceta de diseño paramétrico con drenaje optimizado. Ideal para PLA y PETG en tamaños medianos."
-    },
-    {
-      id: 3,
-      name: "Organizador modular de escritorio",
-      category: "Organización",
-      price: 14.0,
-      tags: ["Módulos", "Oficina"],
-      usage: "Impresión bajo demanda",
-      eta: "96 h",
-      description: "Sistema modular para ordenar elementos de escritorio. Cada módulo se imprime por separado según la orden."
-    },
-    {
-      id: 4,
-      name: "Figura low-poly de zorro",
-      category: "Figuras",
-      price: 12.0,
-      tags: ["Decoración", "Resina"],
-      usage: "Impresión bajo demanda",
-      eta: "72 h",
-      description: "Figura decorativa estilo low-poly pensada para impresión en resina de alta definición."
-    },
-    {
-      id: 5,
-      name: "Gancho para toallas sin tornillos",
-      category: "Hogar",
-      price: 5.5,
-      tags: ["Baño", "Adhesivo"],
-      usage: "Impresión bajo demanda",
-      eta: "48 h",
-      description: "Gancho que se fija con cinta doble faz. Perfecto para alquileres donde no se pueden hacer agujeros."
-    },
-    {
-      id: 6,
-      name: "Clip organizador de cables",
-      category: "Organización",
-      price: 3.9,
-      tags: ["Cables", "Escritorio"],
-      usage: "Impresión bajo demanda",
-      eta: "24 h",
-      description: "Clip simple para ordenar cables de carga. Se puede imprimir en lote para reducir costos."
-    }
-  ];
-
-  let currentCategory = "all";
-
-  function renderDesigns() {
-    const grid = document.getElementById("designGrid");
-    grid.innerHTML = "";
-    const filtered = designs.filter(d => currentCategory === "all" || d.category === currentCategory);
-
-    if (!filtered.length) {
-      grid.innerHTML = `<p style="font-size:0.86rem;color:var(--text-muted);">Todavía no hay modelos en esta categoría (mock).</p>`;
-      return;
-    }
-
-    filtered.forEach(d => {
-      const card = document.createElement("article");
-      card.className = "design-card";
-      card.innerHTML = `
-        <div class="design-thumb">
-          <div class="design-thumb-inner"></div>
-        </div>
-        <h3 class="design-name">${d.name}</h3>
-        <div class="design-meta">
-          <span class="design-tag">${d.category}</span>
-          <span class="design-price">US$ ${d.price.toFixed(2)}</span>
-        </div>
-        <div class="design-badges">
-          ${d.tags.map(t => `<span class="design-badge">${t}</span>`).join("")}
-        </div>
-      `;
-      card.addEventListener("click", () => openModal(d));
-      grid.appendChild(card);
     });
-  }
-
-  function setupFilters() {
-    const filters = document.querySelectorAll(".filter-chip");
-    filters.forEach(btn => {
-      btn.addEventListener("click", () => {
-        filters.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentCategory = btn.dataset.category;
-        renderDesigns();
-      });
-    });
-  }
-
-  function openModal(d) {
-    document.getElementById("modalTitle").textContent = d.name;
-    document.getElementById("modalCategory").textContent = d.category;
-    document.getElementById("modalPrice").textContent = `US$ ${d.price.toFixed(2)}`;
-    document.getElementById("modalUsage").textContent = d.usage;
-    document.getElementById("modalEta").textContent = d.eta;
-    document.getElementById("modalDescription").textContent = d.description;
-    document.getElementById("modalBackdrop").style.display = "flex";
-  }
-
-  function closeModal() {
-    document.getElementById("modalBackdrop").style.display = "none";
-  }
-
-  function showToast(message) {
-    const toast = document.getElementById("toast");
-    toast.textContent = message;
-    toast.style.display = "block";
-    clearTimeout(showToast._timeout);
-    showToast._timeout = setTimeout(() => {
-      toast.style.display = "none";
-    }, 2600);
-  }
-
-  function actionImprimir() {
-    showToast("Acción simulada: crear orden de impresión en Telport.");
-  }
-
-  function scrollToMarketplace() {
-    document.getElementById("marketplace").scrollIntoView({ behavior: "smooth" });
-  }
-  function scrollToDisenadores() {
-    document.getElementById("disenadores").scrollIntoView({ behavior: "smooth" });
-  }
-  function scrollToPreRegistro() {
-    document.getElementById("pre-registro").scrollIntoView({ behavior: "smooth" });
-  }
-
-  document.getElementById("formNuevoDesign").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const nombre = document.getElementById("nuevoNombre").value.trim();
-    const categoria = document.getElementById("nuevoCategoria").value;
-    const precio = parseFloat(document.getElementById("nuevoPrecio").value || "0");
-    const descripcion = document.getElementById("nuevoDescripcion").value.trim() || "Modelo agregado durante la demo. Descripción pendiente.";
-
-    if (!nombre || isNaN(precio)) return;
-
-    const nuevo = {
-      id: Date.now(),
-      name: nombre,
-      category: categoria,
-      price: precio,
-      tags: ["Nuevo", "Mock"],
-      usage: "Impresión bajo demanda",
-      eta: "Por definir",
-      description: descripcion
-    };
-    designs.push(nuevo);
-    renderDesigns();
-    showToast("Modelo agregado al catálogo (mock).");
-    e.target.reset();
-  });
-
-  document.getElementById("formPreRegistro").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("preEmail").value.trim();
-    const rol = document.getElementById("preRol").value;
-    if (!email) return;
-    console.log("Pre-registro (mock):", { email, rol });
-    showToast("Gracias, te vamos a avisar cuando Telport 3D esté listo.");
-    e.target.reset();
-  });
-
-  document.getElementById("year").textContent = new Date().getFullYear();
-
-  document.getElementById("modalBackdrop").addEventListener("click", (e) => {
-    if (e.target.id === "modalBackdrop") closeModal();
-  });
-
-  renderDesigns();
-  setupFilters();
-</script>
+  </script>
 </body>
 </html>
