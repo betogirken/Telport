@@ -2,101 +2,1151 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
+  <title>Telport 3D — Diseños 3D bajo demanda</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Telport — Impresión 3D & Prototipado Rápido</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <meta name="description" content="Telport 3D es la plataforma donde diseñadores suben sus modelos 3D y los usuarios los imprimen directamente desde la web.">
   <style>
-    :root{
-      --bg:#0e1117;
-      --surface:#111827;
-      --card:#ffffff;
-      --text:#e8eefc;
-      --ink:#0b1220;
-      --muted:#9aa4b2;
-      --primary:#22c55e;
-      --radius:18px;
-      --shadow:0 12px 28px rgba(0,0,0,.22);
+    :root {
+      --bg-dark: #020617;
+      --bg-section: #020819;
+      --bg-card: #020617;
+      --primary: #ff4b4b;            /* Rojo Telport aproximado */
+      --primary-soft: rgba(255,75,75,0.2);
+      --accent: #f97373;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --radius-lg: 18px;
+      --shadow-soft: 0 18px 45px rgba(15,23,42,0.9);
+      --border-subtle: 1px solid rgba(148,163,184,0.2);
     }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f6f7fb;color:var(--ink)}
-    header{
-      background: radial-gradient(1200px 600px at 20% -10%, #1e293b 0%, var(--bg) 45%, #0b0e14 100%);
-      color:var(--text);
-      padding: clamp(32px, 6vw, 80px) 24px;
-      position:relative;
-      overflow:hidden;
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #00010a 100%);
+      color: var(--text-main);
+      line-height: 1.5;
     }
-    .wrap{max-width:1120px;margin:0 auto}
-    .brand{display:flex;align-items:center;gap:12px;margin-bottom:28px}
-    .brand .logo{width:48px;height:48px;border-radius:12px;background:#1f2937;display:grid;place-items:center;font-weight:800}
-    .brand .logo span{font-size:20px;letter-spacing:1px}
-    h1{font-size: clamp(28px, 5vw, 54px);line-height:1.05;margin:10px 0 16px}
-    p.lead{font-size: clamp(16px, 2.6vw, 20px);color:#cbd5e1;max-width:64ch}
-    .cta{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
-    .btn{appearance:none;border:0;border-radius:14px;padding:14px 18px;font-weight:600;cursor:pointer}
-    .btn.primary{background:var(--primary);color:#0a111b;box-shadow:var(--shadow)}
-    .btn.ghost{background:transparent;color:var(--text);border:1px solid #334155}
-    .hero-shot{position:absolute;inset:auto -140px -120px auto;opacity:.12;filter:drop-shadow(0 30px 50px rgba(0,0,0,.45))}
-    section{padding: clamp(32px, 6vw, 72px) 24px}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
-    .card{grid-column: span 4;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
-    .card h3{margin:10px 0 8px}
-    .muted{color:#64748b}
-    .band{background:var(--surface);color:var(--text);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
-    .band h2{margin:0 0 10px}
-    footer{padding:28px 24px;color:#6b7280;text-align:center}
-    a{color:inherit}
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .page { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* NAVBAR */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(to bottom, rgba(2,6,23,0.96), rgba(2,6,23,0.8), transparent);
+      border-bottom: 1px solid rgba(30,64,175,0.7);
+    }
+    .nav-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .logo-img-wrapper {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 2px rgba(255,75,75,0.4);
+    }
+    .logo-img-wrapper img {
+      width: 120%;
+      height: auto;
+    }
+    .logo-text-main {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      font-size: 1rem;
+      text-transform: uppercase;
+    }
+    .logo-text-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .nav-links a {
+      padding: 0.35rem 0.6rem;
+      border-radius: 999px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .nav-links a:hover {
+      background: rgba(15,23,42,0.9);
+      color: var(--text-main);
+    }
+    .nav-cta {
+      padding: 0.4rem 0.95rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,75,75,0.7);
+      background: linear-gradient(to right, rgba(255,75,75,0.25), rgba(255,75,75,0.05));
+      color: #fee2e2;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+    }
+
+    main { flex: 1; }
+    .section {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem;
+    }
+    @media (min-width: 1024px) {
+      .section { padding: 3.5rem 1.25rem; }
+    }
+
+    /* HERO */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr);
+      gap: 2rem;
+      padding-top: 2.5rem;
+      padding-bottom: 1.5rem;
+    }
+    @media (min-width: 900px) {
+      .hero {
+        grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+        align-items: stretch;
+      }
+    }
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.85);
+      border: 1px solid rgba(255,75,75,0.6);
+      font-size: 0.72rem;
+      color: #fecaca;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 8px rgba(34,197,94,0.3);
+    }
+    .hero-title {
+      font-size: clamp(2rem, 3vw + 1.2rem, 2.7rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .hero-title span {
+      color: var(--primary);
+    }
+    .hero-subtitle {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      max-width: 32rem;
+    }
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      margin-top: 0.3rem;
+    }
+    .btn {
+      border-radius: 999px;
+      padding: 0.7rem 1.3rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(to right, var(--primary), #fb7185);
+      color: #111827;
+      box-shadow: 0 16px 45px rgba(248,113,113,0.45);
+    }
+    .btn-outline {
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.85);
+      color: var(--text-main);
+    }
+    .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; }
+
+    .hero-metas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+    .hero-meta-item strong {
+      display: block;
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    .hero-right { display: none; }
+    @media (min-width: 900px) { .hero-right { display: block; } }
+
+    .mock-card {
+      background: radial-gradient(circle at top left, rgba(255,75,75,0.22), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(248,113,113,0.25), transparent 55%),
+                  #020617;
+      border-radius: 26px;
+      border: 1px solid rgba(148,163,184,0.4);
+      padding: 1.3rem;
+      box-shadow: var(--shadow-soft);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .mock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .mock-tabs {
+      display: inline-flex;
+      background: rgba(15,23,42,0.8);
+      padding: 0.15rem;
+      border-radius: 999px;
+      gap: 0.2rem;
+    }
+    .mock-tab {
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+    .mock-tab.active {
+      background: rgba(15,23,42,0.95);
+      color: #fee2e2;
+    }
+    .mock-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.7rem;
+      margin-top: 0.2rem;
+      flex: 1;
+    }
+    .mock-card-item {
+      border-radius: 14px;
+      padding: 0.6rem;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(51,65,85,0.9);
+      font-size: 0.7rem;
+    }
+    .mock-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      background: rgba(15,23,42,0.85);
+      border-radius: 999px;
+      padding: 0.2rem 0.45rem;
+      font-size: 0.65rem;
+      margin-top: 0.4rem;
+    }
+    .mock-stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.35rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* SECTION TITLES */
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .section-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-width: 34rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* COMO FUNCIONA */
+    .steps {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1rem;
+    }
+    @media (min-width: 800px) {
+      .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    .step-card {
+      background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
+      border-radius: var(--radius-lg);
+      border: var(--border-subtle);
+      padding: 1rem;
+    }
+    .step-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(255,75,75,0.18);
+      border: 1px solid rgba(255,75,75,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #fecaca;
+      margin-bottom: 0.5rem;
+    }
+    .step-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .step-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* MARKETPLACE */
+    .marketplace {
+      margin-top: 0.5rem;
+      border-radius: 24px;
+      padding: 1.3rem;
+      background: linear-gradient(to bottom, rgba(15,23,42,0.96), rgba(15,23,42,0.98));
+      border: 1px solid rgba(75,85,99,0.9);
+      box-shadow: var(--shadow-soft);
+    }
+    .marketplace-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .marketplace-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+    }
+    .filter-chip {
+      border-radius: 999px;
+      padding: 0.35rem 0.8rem;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.8);
+      cursor: pointer;
+    }
+    .filter-chip.active {
+      background: var(--primary-soft);
+      border-color: rgba(255,75,75,0.9);
+      color: #fee2e2;
+    }
+    .marketplace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.9rem;
+    }
+    @media (min-width: 640px) {
+      .marketplace-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 980px) {
+      .marketplace-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    .design-card {
+      background: linear-gradient(to bottom, #020617, #020617);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(51,65,85,0.9);
+      padding: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .design-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(15,23,42,0.8);
+      border-color: rgba(255,75,75,0.9);
+    }
+    .design-thumb {
+      border-radius: 14px;
+      height: 120px;
+      background: radial-gradient(circle at top, rgba(255,75,75,0.35), rgba(15,23,42,0.85)),
+                  radial-gradient(circle at bottom, rgba(248,113,113,0.25), rgba(15,23,42,1));
+      margin-bottom: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .design-thumb-inner {
+      position: absolute;
+      inset: 12%;
+      border-radius: 20px;
+      border: 1px dashed rgba(148,163,184,0.5);
+      backdrop-filter: blur(4px);
+      background: linear-gradient(135deg, rgba(15,23,42,0.8), rgba(15,23,42,0.2));
+    }
+    .design-name { font-size: 0.9rem; font-weight: 600; }
+    .design-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .design-tag {
+      border-radius: 999px;
+      padding: 0.18rem 0.5rem;
+      font-size: 0.7rem;
+      background: rgba(15,23,42,0.85);
+      border: 1px solid rgba(75,85,99,0.8);
+    }
+    .design-price {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+    .design-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.2rem;
+      margin-top: 0.35rem;
+      font-size: 0.7rem;
+    }
+    .design-badge {
+      border-radius: 999px;
+      padding: 0.12rem 0.45rem;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(55,65,81,0.8);
+    }
+
+    /* DISEÑADORES + FORM */
+    .designer-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.2rem;
+      margin-top: 0.5rem;
+    }
+    @media (min-width: 880px) {
+      .designer-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr); }
+    }
+    .designer-card {
+      border-radius: 22px;
+      padding: 1.2rem;
+      background: linear-gradient(to bottom right, rgba(15,23,42,0.97), rgba(24,24,35,0.98));
+      border: 1px solid rgba(75,85,99,0.9);
+      box-shadow: var(--shadow-soft);
+    }
+    .designer-list {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.7rem;
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .designer-list li {
+      display: flex;
+      gap: 0.4rem;
+    }
+    .designer-dot {
+      margin-top: 0.2rem;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--primary);
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      margin-top: 0.5rem;
+      font-size: 0.86rem;
+    }
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .form label {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+    .input, select, textarea {
+      border-radius: 12px;
+      border: 1px solid rgba(75,85,99,0.9);
+      background: rgba(15,23,42,0.95);
+      padding: 0.5rem 0.7rem;
+      color: var(--text-main);
+      font: inherit;
+    }
+    .input::placeholder, textarea::placeholder {
+      color: rgba(148,163,184,0.8);
+    }
+    textarea { resize: vertical; min-height: 70px; }
+    .helper { font-size: 0.7rem; color: var(--text-muted); }
+
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 1rem;
+    }
+    .modal {
+      max-width: 480px;
+      width: 100%;
+      border-radius: 22px;
+      background: #020617;
+      border: 1px solid rgba(148,163,184,0.7);
+      box-shadow: 0 24px 80px rgba(15,23,42,0.95);
+      padding: 1.2rem;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .modal-title { font-size: 1rem; font-weight: 600; }
+    .modal-close {
+      border-radius: 999px;
+      border: 1px solid rgba(75,85,99,0.8);
+      background: rgba(15,23,42,0.9);
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+    .modal-body {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 0.7rem;
+    }
+    .modal-body-rows { display: grid; gap: 0.25rem; }
+    .modal-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.7rem 1rem;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.97);
+      border: 1px solid rgba(34,197,94,0.7);
+      color: #bbf7d0;
+      font-size: 0.8rem;
+      display: none;
+      z-index: 60;
+      box-shadow: 0 18px 45px rgba(15,23,42,0.9);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid rgba(30,64,175,0.8);
+      background: radial-gradient(circle at top, rgba(15,23,42,0.97), #020617);
+      margin-top: 2rem;
+    }
+    .footer-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.4rem 1.25rem 1.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.7rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .footer-inner a {
+      text-decoration: underline;
+      text-decoration-color: rgba(148,163,184,0.5);
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="brand">
-        <div class="logo"><span>TP</span></div>
+<div class="page">
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <div class="logo">
+        <div class="logo-img-wrapper">
+          <!-- Guardar tu logo como logo-telport.png en la misma carpeta -->
+          <img src="logo-telport.png" alt="Logo Telport 3D">
+        </div>
         <div>
-          <div style="font-size:18px;font-weight:700;letter-spacing:.4px">Telport</div>
-          <div class="muted" style="font-size:13px">Impresión 3D • Prototipado • Diseño</div>
+          <div class="logo-text-main">TELPORT 3D</div>
+          <div class="logo-text-sub">Impresión 3D bajo demanda</div>
         </div>
       </div>
-      <h1>Fabricá hoy lo que imaginás para mañana</h1>
-      <p class="lead">Servicio de impresión 3D y prototipado rápido para emprendedores, ingenierías y educación. Materiales PLA, PETG y resinas técnicas. Entregas en 48–72 h.</p>
-      <div class="cta">
-        <a class="btn primary" href="#contacto">Pedir presupuesto</a>
-        <a class="btn ghost" href="#servicios">Ver servicios</a>
-      </div>
-      <svg class="hero-shot" width="700" height="420" viewBox="0 0 700 420" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="60" y="50" width="580" height="300" rx="24" stroke="white" opacity=".14"/>
-        <path d="M90 280 L200 220 L360 260 L520 210 L610 240" stroke="white" opacity=".14"/>
-        <circle cx="200" cy="140" r="26" stroke="white" opacity=".14"/>
-      </svg>
+      <nav class="nav-links">
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#marketplace">Modelos</a>
+        <a href="#disenadores">Diseñadores</a>
+        <button class="nav-cta" onclick="scrollToPreRegistro()">
+          <span>Acceso anticipado</span> →
+        </button>
+      </nav>
     </div>
   </header>
-  <section id="servicios">
-    <div class="wrap grid">
-      <div class="band" style="grid-column: span 12">
-        <h2>Servicios</h2>
-        <p class="muted">Diseño CAD a medida, optimización para impresión, armado y posprocesado. Soporte para educación y PYMES.</p>
-      </div>
-      <article class="card"><h3>Impresión 3D FDM</h3><p class="muted">Prototipos funcionales en PLA/PETG/TPU. Volumen 220×220×250 mm. Tolerancias típicas ±0.2 mm.</p></article>
-      <article class="card"><h3>Resina (SLA/DLP)</h3><p class="muted">Alta resolución para piezas pequeñas y detalladas. Ideal para ingeniería y dental.</p></article>
-      <article class="card"><h3>Diseño & CAD</h3><p class="muted">Modelado 3D, conversión de STL/STEP, hollows, refuerzos y validación estructural básica.</p></article>
-    </div>
-  </section>
-  <section><div class="wrap grid"><div class="band" style="grid-column: span 12"><h2>Cómo trabajamos</h2><p class="muted">1) Enviás tu archivo (STL/STEP) o una idea. 2) Cotizamos. 3) Producción en 48–72 h. 4) Entrega o envío.</p></div></div></section>
-  <section id="contacto">
-    <div class="wrap grid">
-      <div class="band" style="grid-column: span 12">
-        <h2>Contacto</h2>
-        <p class="muted">Escribinos por WhatsApp o email. Respuesta en menos de 24 h hábiles.</p>
-        <div class="cta">
-          <a class="btn primary" href="https://wa.me/5490000000000" target="_blank" rel="noopener">WhatsApp</a>
-          <a class="btn ghost" href="mailto:contacto@tudominio.com">contacto@tudominio.com</a>
+
+  <main>
+    <!-- HERO -->
+    <section class="section hero">
+      <div class="hero-left">
+        <div class="pill">
+          <span class="pill-dot"></span>
+          Plataforma en construcción · MVP
+        </div>
+        <h1 class="hero-title">
+          Diseños 3D que se imprimen <span>directamente desde la web</span>.
+        </h1>
+        <p class="hero-subtitle">
+          Los diseñadores suben sus modelos 3D a Telport y los usuarios generan una orden de impresión
+          online. Sin descargas, sin archivos dando vueltas: del diseño al objeto físico.
+        </p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary" onclick="scrollToDisenadores()">
+            Soy diseñador 3D
+          </button>
+          <button class="btn btn-outline" onclick="scrollToMarketplace()">
+            Quiero mandar a imprimir
+          </button>
+        </div>
+        <div class="hero-metas">
+          <div class="hero-meta-item">
+            <strong>Impresión directa</strong>
+            Todo el flujo ocurre en Telport
+          </div>
+          <div class="hero-meta-item">
+            <strong>Latam first</strong>
+            Foco inicial: centros de impresión en Argentina
+          </div>
+          <div class="hero-meta-item">
+            <strong>MVP</strong>
+            Front listo para conectar backend de órdenes
+          </div>
         </div>
       </div>
+
+      <!-- Mock app -->
+      <div class="hero-right">
+        <div class="mock-card">
+          <div class="mock-header">
+            <div>
+              <div style="font-size:0.8rem;font-weight:600;">Panel Telport · Beta</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);">Vista combinada diseñador / órdenes de impresión</div>
+            </div>
+            <div class="mock-tabs">
+              <div class="mock-tab active">Modelos</div>
+              <div class="mock-tab">Órdenes</div>
+            </div>
+          </div>
+          <div class="mock-grid">
+            <div class="mock-card-item">
+              <div style="font-size:0.8rem;font-weight:600;">Soporte de auriculares</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);">Gadget · PLA</div>
+              <div class="mock-stat-row"><span>Órdenes</span><span>57</span></div>
+              <div class="mock-stat-row"><span>Impreso en</span><span>3 centros</span></div>
+            </div>
+            <div class="mock-card-item">
+              <div style="font-size:0.8rem;font-weight:600;">Maceta paramétrica</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);">Hogar · Decoración</div>
+              <div class="mock-stat-row"><span>Royalties</span><span>US$ 124</span></div>
+              <div class="mock-stat-row"><span>Rating</span><span>4.8★</span></div>
+            </div>
+            <div class="mock-card-item">
+              <div style="font-size:0.8rem;font-weight:600;">Portallaves pared</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);">Hogar · PLA</div>
+              <div class="mock-chip"><span>Modelo listo para imprimir</span></div>
+            </div>
+            <div class="mock-card-item">
+              <div style="font-size:0.8rem;font-weight:600;">Figura low-poly</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);">Coleccionable · Resina</div>
+              <div class="mock-chip"><span>Entrega estimada 72h</span></div>
+            </div>
+          </div>
+          <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;">
+            <span>Todo es mock: listo para conectarlo a un sistema real de impresión.</span>
+            <span style="font-size:0.7rem;color:var(--primary);">v0.1</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMO FUNCIONA -->
+    <section class="section" id="como-funciona">
+      <h2 class="section-title">Cómo funciona Telport 3D</h2>
+      <p class="section-subtitle">
+        Una única plataforma para publicar modelos 3D y transformarlos en objetos físicos,
+        gestionando órdenes de impresión en centros asociados.
+      </p>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-badge">1</div>
+          <div class="step-title">El diseñador sube su modelo</div>
+          <p class="step-text">
+            Carga el archivo 3D (STL, OBJ, etc.), define categoría, descripción
+            y precio por impresión. El archivo nunca se descarga: se usa sólo para imprimir.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">2</div>
+          <div class="step-title">El usuario genera una orden</div>
+          <p class="step-text">
+            Elige el modelo, define material, color y tamaño. Confirma la orden y
+            Telport envía el job al centro de impresión disponible.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">3</div>
+          <div class="step-title">Impresión y entrega</div>
+          <p class="step-text">
+            El backend coordina la cola de impresión, calcula costos,
+            paga el royalty al diseñador y gestiona el envío al usuario final.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARKETPLACE MOCK -->
+    <section class="section" id="marketplace">
+      <div class="marketplace">
+        <div class="marketplace-header">
+          <div>
+            <h2 class="section-title" style="margin-bottom:0;">Modelos listos para imprimir (mock)</h2>
+            <p class="section-subtitle" style="margin-bottom:0.4rem;">
+              Ejemplos de cómo se vería el catálogo. Los datos se generan en JavaScript, listos para
+              reemplazar por una API real de Telport.
+            </p>
+          </div>
+          <div class="marketplace-filters" id="filters">
+            <button class="filter-chip active" data-category="all">Todos</button>
+            <button class="filter-chip" data-category="Gadgets">Gadgets</button>
+            <button class="filter-chip" data-category="Hogar">Hogar</button>
+            <button class="filter-chip" data-category="Figuras">Figuras</button>
+            <button class="filter-chip" data-category="Organización">Organización</button>
+          </div>
+        </div>
+        <div class="marketplace-grid" id="designGrid">
+          <!-- JS inyecta los modelos -->
+        </div>
+      </div>
+    </section>
+
+    <!-- DISEÑADORES + FORM -->
+    <section class="section" id="disenadores">
+      <h2 class="section-title">Para diseñadores 3D</h2>
+      <p class="section-subtitle">
+        Vos diseñás, Telport imprime. El objetivo es que moneticés tus modelos sin tener que
+        compartir archivos ni gestionar la parte operativa de la impresión.
+      </p>
+
+      <div class="designer-grid">
+        <div class="designer-card">
+          <h3 style="font-size:1rem;font-weight:600;margin-bottom:0.4rem;">Qué va a permitir tu panel</h3>
+          <ul class="designer-list">
+            <li>
+              <div class="designer-dot"></div>
+              <div>Subir y gestionar tu catálogo de modelos 3D en un solo lugar.</div>
+            </li>
+            <li>
+              <div class="designer-dot"></div>
+              <div>Definir precio por impresión, sin necesidad de vender el archivo.</div>
+            </li>
+            <li>
+              <div class="designer-dot"></div>
+              <div>Ver métricas: órdenes, centros donde se imprimió, ingresos acumulados.</div>
+            </li>
+            <li>
+              <div class="designer-dot"></div>
+              <div>Recibir tus royalties automáticamente cada vez que se imprime tu diseño.</div>
+            </li>
+          </ul>
+          <p class="helper" style="margin-top:0.6rem;">
+            Abajo simulamos un formulario de carga de diseño. Por ahora sólo impacta en el grid
+            de esta landing, pero es el mismo flujo que luego se conectaría al backend real.
+          </p>
+        </div>
+
+        <div class="designer-card" id="pre-registro">
+          <h3 style="font-size:1rem;font-weight:600;margin-bottom:0.4rem;">Simulá subir un diseño</h3>
+          <form class="form" id="formNuevoDesign">
+            <div class="form-row">
+              <label>Nombre del diseño</label>
+              <input class="input" type="text" id="nuevoNombre" placeholder="Ej: Soporte minimalista para celular" required>
+            </div>
+            <div class="form-row">
+              <label>Categoría</label>
+              <select id="nuevoCategoria" required>
+                <option value="Gadgets">Gadgets</option>
+                <option value="Hogar">Hogar</option>
+                <option value="Figuras">Figuras</option>
+                <option value="Organización">Organización</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Precio por impresión (USD)</label>
+              <input class="input" type="number" step="0.01" min="0" id="nuevoPrecio" placeholder="Ej: 9.90" required>
+            </div>
+            <div class="form-row">
+              <label>Descripción corta</label>
+              <textarea id="nuevoDescripcion" placeholder="Breve descripción del modelo y usos recomendados."></textarea>
+            </div>
+            <div class="form-row">
+              <label>Archivo 3D (mock)</label>
+              <input class="input" type="file" accept=".stl,.obj,.3mf" />
+              <span class="helper">
+                En el MVP esto se simula; en producción el archivo se usará sólo para generar las impresiones,
+                no para descarga.
+              </span>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:0.3rem;">
+              Agregar al catálogo (mock)
+            </button>
+            <p class="helper">
+              Al enviar, el diseño aparece en la sección “Modelos listos para imprimir” como ejemplo de flujo.
+            </p>
+          </form>
+
+          <hr style="border:none;border-top:1px solid rgba(55,65,81,0.9);margin:0.9rem 0;" />
+
+          <h3 style="font-size:0.95rem;font-weight:600;margin-bottom:0.4rem;">Acceso anticipado</h3>
+          <form class="form" id="formPreRegistro">
+            <div class="form-row">
+              <label>Correo electrónico</label>
+              <input class="input" type="email" id="preEmail" placeholder="tuemail@ejemplo.com" required>
+            </div>
+            <div class="form-row">
+              <label>Rol</label>
+              <select id="preRol">
+                <option value="disenador">Soy diseñador 3D</option>
+                <option value="usuario">Quiero mandar a imprimir modelos</option>
+                <option value="centro">Tengo centro de impresión</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-outline btn-sm" style="align-self:flex-start;">
+              Quiero que me avisen cuando esté listo
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div>© <span id="year"></span> Telport 3D. MVP de concepto.</div>
+      <div>
+        Proyecto creado en Salta, Argentina · Contacto: <a href="mailto:info@telport3d.com">info@telport3d.com</a>
+      </div>
     </div>
-  </section>
-  <footer>© <span id="y"></span> Telport — Hecho con ♥ en Argentina</footer>
-  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  </footer>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle">Nombre diseño</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);" id="modalCategory">Categoría</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-body-rows">
+        <div class="modal-row">
+          <span>Tipo de servicio</span>
+          <span id="modalUsage">Impresión bajo demanda</span>
+        </div>
+        <div class="modal-row">
+          <span>Precio por impresión</span>
+          <span id="modalPrice">US$ 0.00</span>
+        </div>
+        <div class="modal-row">
+          <span>Tiempo estimado (mock)</span>
+          <span id="modalEta">48 h</span>
+        </div>
+      </div>
+      <p id="modalDescription">
+        Descripción del modelo. En el futuro esta info vendrá directamente del diseñador y se
+        usará para cotizar mejor la impresión.
+      </p>
+      <p class="helper">
+        Acciones simuladas para demo: todavía no hay backend. Pensado para mostrar el flujo
+        a socios, centros de impresión o inversores.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-actions">
+        <button class="btn btn-primary btn-sm" onclick="actionImprimir()">
+          Pedir impresión
+        </button>
+      </div>
+      <div style="font-size:0.7rem;color:var(--text-muted);">
+        Estado backend: <span style="color:#facc15;">por conectar</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const designs = [
+    {
+      id: 1,
+      name: "Soporte articulado para celular",
+      category: "Gadgets",
+      price: 8.9,
+      tags: ["PLA", "Escritorio"],
+      usage: "Impresión bajo demanda",
+      eta: "48 h",
+      description: "Soporte regulable para celular, optimizado para impresión FDM. La orden se envía directamente a un centro de impresión asociado."
+    },
+    {
+      id: 2,
+      name: "Maceta paramétrica hexagonal",
+      category: "Hogar",
+      price: 11.5,
+      tags: ["Decoración", "Interior"],
+      usage: "Impresión bajo demanda",
+      eta: "72 h",
+      description: "Maceta de diseño paramétrico con drenaje optimizado. Ideal para PLA y PETG en tamaños medianos."
+    },
+    {
+      id: 3,
+      name: "Organizador modular de escritorio",
+      category: "Organización",
+      price: 14.0,
+      tags: ["Módulos", "Oficina"],
+      usage: "Impresión bajo demanda",
+      eta: "96 h",
+      description: "Sistema modular para ordenar elementos de escritorio. Cada módulo se imprime por separado según la orden."
+    },
+    {
+      id: 4,
+      name: "Figura low-poly de zorro",
+      category: "Figuras",
+      price: 12.0,
+      tags: ["Decoración", "Resina"],
+      usage: "Impresión bajo demanda",
+      eta: "72 h",
+      description: "Figura decorativa estilo low-poly pensada para impresión en resina de alta definición."
+    },
+    {
+      id: 5,
+      name: "Gancho para toallas sin tornillos",
+      category: "Hogar",
+      price: 5.5,
+      tags: ["Baño", "Adhesivo"],
+      usage: "Impresión bajo demanda",
+      eta: "48 h",
+      description: "Gancho que se fija con cinta doble faz. Perfecto para alquileres donde no se pueden hacer agujeros."
+    },
+    {
+      id: 6,
+      name: "Clip organizador de cables",
+      category: "Organización",
+      price: 3.9,
+      tags: ["Cables", "Escritorio"],
+      usage: "Impresión bajo demanda",
+      eta: "24 h",
+      description: "Clip simple para ordenar cables de carga. Se puede imprimir en lote para reducir costos."
+    }
+  ];
+
+  let currentCategory = "all";
+
+  function renderDesigns() {
+    const grid = document.getElementById("designGrid");
+    grid.innerHTML = "";
+    const filtered = designs.filter(d => currentCategory === "all" || d.category === currentCategory);
+
+    if (!filtered.length) {
+      grid.innerHTML = `<p style="font-size:0.86rem;color:var(--text-muted);">Todavía no hay modelos en esta categoría (mock).</p>`;
+      return;
+    }
+
+    filtered.forEach(d => {
+      const card = document.createElement("article");
+      card.className = "design-card";
+      card.innerHTML = `
+        <div class="design-thumb">
+          <div class="design-thumb-inner"></div>
+        </div>
+        <h3 class="design-name">${d.name}</h3>
+        <div class="design-meta">
+          <span class="design-tag">${d.category}</span>
+          <span class="design-price">US$ ${d.price.toFixed(2)}</span>
+        </div>
+        <div class="design-badges">
+          ${d.tags.map(t => `<span class="design-badge">${t}</span>`).join("")}
+        </div>
+      `;
+      card.addEventListener("click", () => openModal(d));
+      grid.appendChild(card);
+    });
+  }
+
+  function setupFilters() {
+    const filters = document.querySelectorAll(".filter-chip");
+    filters.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filters.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentCategory = btn.dataset.category;
+        renderDesigns();
+      });
+    });
+  }
+
+  function openModal(d) {
+    document.getElementById("modalTitle").textContent = d.name;
+    document.getElementById("modalCategory").textContent = d.category;
+    document.getElementById("modalPrice").textContent = `US$ ${d.price.toFixed(2)}`;
+    document.getElementById("modalUsage").textContent = d.usage;
+    document.getElementById("modalEta").textContent = d.eta;
+    document.getElementById("modalDescription").textContent = d.description;
+    document.getElementById("modalBackdrop").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("modalBackdrop").style.display = "none";
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.display = "block";
+    clearTimeout(showToast._timeout);
+    showToast._timeout = setTimeout(() => {
+      toast.style.display = "none";
+    }, 2600);
+  }
+
+  function actionImprimir() {
+    showToast("Acción simulada: crear orden de impresión en Telport.");
+  }
+
+  function scrollToMarketplace() {
+    document.getElementById("marketplace").scrollIntoView({ behavior: "smooth" });
+  }
+  function scrollToDisenadores() {
+    document.getElementById("disenadores").scrollIntoView({ behavior: "smooth" });
+  }
+  function scrollToPreRegistro() {
+    document.getElementById("pre-registro").scrollIntoView({ behavior: "smooth" });
+  }
+
+  document.getElementById("formNuevoDesign").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById("nuevoNombre").value.trim();
+    const categoria = document.getElementById("nuevoCategoria").value;
+    const precio = parseFloat(document.getElementById("nuevoPrecio").value || "0");
+    const descripcion = document.getElementById("nuevoDescripcion").value.trim() || "Modelo agregado durante la demo. Descripción pendiente.";
+
+    if (!nombre || isNaN(precio)) return;
+
+    const nuevo = {
+      id: Date.now(),
+      name: nombre,
+      category: categoria,
+      price: precio,
+      tags: ["Nuevo", "Mock"],
+      usage: "Impresión bajo demanda",
+      eta: "Por definir",
+      description: descripcion
+    };
+    designs.push(nuevo);
+    renderDesigns();
+    showToast("Modelo agregado al catálogo (mock).");
+    e.target.reset();
+  });
+
+  document.getElementById("formPreRegistro").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("preEmail").value.trim();
+    const rol = document.getElementById("preRol").value;
+    if (!email) return;
+    console.log("Pre-registro (mock):", { email, rol });
+    showToast("Gracias, te vamos a avisar cuando Telport 3D esté listo.");
+    e.target.reset();
+  });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  document.getElementById("modalBackdrop").addEventListener("click", (e) => {
+    if (e.target.id === "modalBackdrop") closeModal();
+  });
+
+  renderDesigns();
+  setupFilters();
+</script>
 </body>
 </html>
