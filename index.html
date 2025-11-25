@@ -10,7 +10,7 @@
       --bg-dark: #020617;
       --bg-section: #020819;
       --bg-card: #020617;
-      --primary: #ff4b4b;            /* Rojo Telport aproximado */
+      --primary: #ff4b4b;
       --primary-soft: rgba(255,75,75,0.2);
       --accent: #f97373;
       --text-main: #e5e7eb;
@@ -32,7 +32,6 @@
 
     .page { min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* NAVBAR */
     .navbar {
       position: sticky;
       top: 0;
@@ -119,7 +118,6 @@
       .section { padding: 3.5rem 1.25rem; }
     }
 
-    /* HERO */
     .hero {
       display: grid;
       grid-template-columns: minmax(0, 1.2fr);
@@ -287,7 +285,6 @@
       color: var(--text-muted);
     }
 
-    /* SECTION TITLES */
     .section-title {
       font-size: 1.3rem;
       font-weight: 700;
@@ -300,7 +297,6 @@
       margin-bottom: 1.5rem;
     }
 
-    /* COMO FUNCIONA */
     .steps {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -338,7 +334,6 @@
       color: var(--text-muted);
     }
 
-    /* MARKETPLACE */
     .marketplace {
       margin-top: 0.5rem;
       border-radius: 24px;
@@ -452,7 +447,6 @@
       border: 1px solid rgba(55,65,81,0.8);
     }
 
-    /* DISEÑADORES + FORM */
     .designer-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -519,7 +513,6 @@
     textarea { resize: vertical; min-height: 70px; }
     .helper { font-size: 0.7rem; color: var(--text-muted); }
 
-    /* MODAL */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -587,7 +580,6 @@
       flex-wrap: wrap;
     }
 
-    /* TOAST */
     .toast {
       position: fixed;
       bottom: 1rem;
@@ -603,7 +595,6 @@
       box-shadow: 0 18px 45px rgba(15,23,42,0.9);
     }
 
-    /* FOOTER */
     footer {
       border-top: 1px solid rgba(30,64,175,0.8);
       background: radial-gradient(circle at top, rgba(15,23,42,0.97), #020617);
@@ -628,12 +619,10 @@
 </head>
 <body>
 <div class="page">
-  <!-- NAVBAR -->
   <header class="navbar">
     <div class="nav-inner">
       <div class="logo">
         <div class="logo-img-wrapper">
-          <!-- Guardar tu logo como logo-telport.png en la misma carpeta -->
           <img src="logo-telport.jpg" alt="Logo Telport 3D">
         </div>
         <div>
@@ -653,7 +642,6 @@
   </header>
 
   <main>
-    <!-- HERO -->
     <section class="section hero">
       <div class="hero-left">
         <div class="pill">
@@ -691,7 +679,6 @@
         </div>
       </div>
 
-      <!-- Mock app -->
       <div class="hero-right">
         <div class="mock-card">
           <div class="mock-header">
@@ -736,7 +723,6 @@
       </div>
     </section>
 
-    <!-- COMO FUNCIONA -->
     <section class="section" id="como-funciona">
       <h2 class="section-title">Cómo funciona Telport 3D</h2>
       <p class="section-subtitle">
@@ -771,7 +757,6 @@
       </div>
     </section>
 
-    <!-- MARKETPLACE MOCK -->
     <section class="section" id="marketplace">
       <div class="marketplace">
         <div class="marketplace-header">
@@ -790,13 +775,10 @@
             <button class="filter-chip" data-category="Organización">Organización</button>
           </div>
         </div>
-        <div class="marketplace-grid" id="designGrid">
-          <!-- JS inyecta los modelos -->
-        </div>
+        <div class="marketplace-grid" id="designGrid"></div>
       </div>
     </section>
 
-    <!-- DISEÑADORES + FORM -->
     <section class="section" id="disenadores">
       <h2 class="section-title">Para diseñadores 3D</h2>
       <p class="section-subtitle">
@@ -833,6 +815,14 @@
 
         <div class="designer-card" id="pre-registro">
           <h3 style="font-size:1rem;font-weight:600;margin-bottom:0.4rem;">Simulá subir un diseño</h3>
+
+          <p id="auth-info" class="helper" style="margin-bottom:0.4rem;">
+            Iniciá sesión con Google para poder subir modelos de prueba.
+          </p>
+          <button type="button" class="btn btn-outline btn-sm" id="btn-auth-google" style="margin-bottom:0.8rem;">
+            Iniciar sesión con Google
+          </button>
+
           <form class="form" id="formNuevoDesign">
             <div class="form-row">
               <label>Nombre del diseño</label>
@@ -896,7 +886,6 @@
     </section>
   </main>
 
-  <!-- FOOTER -->
   <footer>
     <div class="footer-inner">
       <div>© <span id="year"></span> Telport 3D. MVP de concepto.</div>
@@ -907,7 +896,6 @@
   </footer>
 </div>
 
-<!-- MODAL -->
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal">
     <div class="modal-header">
@@ -954,8 +942,74 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyB0P3VJuZGFcU_wHQ0QKGTtLjmETb0zyo",
+    authDomain: "telport3d.firebaseapp.com",
+    projectId: "telport3d",
+    storageBucket: "telport3d.firebasestorage.app",
+    messagingSenderId: "171341331188",
+    appId: "1:171341331188:web:b7c7362e0268b0043dbca1"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  let currentUser = null;
+
+  function signInWithGoogle() {
+    auth.signInWithPopup(provider)
+      .then((result) => {
+        console.log("Login ok:", result.user);
+      })
+      .catch((err) => {
+        console.error(err);
+        if (typeof showToast === "function") {
+          showToast("No se pudo iniciar sesión con Google.");
+        } else {
+          alert("No se pudo iniciar sesión con Google.");
+        }
+      });
+  }
+
+  function signOut() {
+    auth.signOut();
+  }
+
+  auth.onAuthStateChanged((user) => {
+    currentUser = user;
+    updateUiForAuth(user);
+  });
+
+  function updateUiForAuth(user) {
+    const formNuevo = document.getElementById("formNuevoDesign");
+    const authInfo = document.getElementById("auth-info");
+    const authBtn = document.getElementById("btn-auth-google");
+
+    if (!formNuevo || !authInfo || !authBtn) return;
+
+    if (user) {
+      [...formNuevo.elements].forEach(el => el.disabled = false);
+      authInfo.textContent = `Conectado como ${user.displayName || user.email}`;
+      authBtn.textContent = "Cerrar sesión";
+      authBtn.onclick = signOut;
+    } else {
+      [...formNuevo.elements].forEach(el => {
+        if (el.type !== "button" && el.type !== "submit") el.disabled = true;
+      });
+      authInfo.textContent = "Iniciá sesión con Google para poder subir diseños.";
+      authBtn.textContent = "Iniciar sesión con Google";
+      authBtn.onclick = signInWithGoogle;
+    }
+  }
+</script>
 
 <script>
   const designs = [
